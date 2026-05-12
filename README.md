@@ -1,20 +1,20 @@
-# CrashLens
+# crashlens
 
-Welcome to CrashLens.
+Welcome to crashlens.
 
 Here, we are going to learn debugging one step at a time. When a program crashes, our goal is not just to say that an error happened. Our goal is to understand how that error can be captured, inspected, and explained.
 
-We will build a small debugger-like tool from scratch and use it to study real program failures. We will learn how to find the exact address where a crash occurred, how to inspect registers, how to trace which functions led to the crash, and how to reason about why the crash happened. CrashLens is designed as an educational project: a place where students can see how debugging works underneath the surface by directly implementing the pieces themselves.
+We will build a small debugger-like tool from scratch and use it to study real program failures. We will learn how to find the exact address where a crash occurred, how to inspect registers, how to trace which functions led to the crash, and how to reason about why the crash happened. crashlens is designed as an educational project: a place where students can see how debugging works underneath the surface by directly implementing the pieces themselves.
 
 ## Lecture 1: Understanding `ptrace()`
-CrashLens is used like this:
+crashlens is used like this:
 ````bash
 ./crashlens <target_program> <args for target_program>
 ````
-The goal of CrashLens is to run a target program and observe what happens when that program stops(by normal exit, crash, signal, etc).
-To do this, CrashLens uses a parent-child process structure. First, CrashLens calls `fork()`. After `fork()`, there are now two processes:  
+The goal of crashlens is to run a target program and observe what happens when that program stops(by normal exit, crash, signal, etc).
+To do this, crashlens uses a parent-child process structure. First, crashlens calls `fork()`. After `fork()`, there are now two processes:  
 ````text
-parent process: CrashLens itself  
+parent process: crashlens itself  
 child process:  the process that will become the target program
 ````
 The child process will eventually run the target program. The parent process will monitor that child process. 
