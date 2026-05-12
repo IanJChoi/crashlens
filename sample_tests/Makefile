@@ -1,5 +1,5 @@
 CXX      = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra
+CXXFLAGS = -std=c++17 -Wall -Wextra -O0 -fno-omit-frame-pointer -no-pie
 
 TARGETS = normal_exit segv
 
