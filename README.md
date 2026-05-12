@@ -9,7 +9,9 @@ We will build a small debugger-like tool from scratch and use it to study real p
 ## Lecture 1: Understanding `ptrace()`
 
 CrashLens is used like this:
+````bash
 ./crashlens <target_program> <args for target_program>
+````
 
 The goal of CrashLens is to run a target program and observe what happens when that program exits, receives a signal, or crashes.
 To do this, CrashLens uses a parent-child process structure.
