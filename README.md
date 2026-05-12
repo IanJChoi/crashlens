@@ -13,39 +13,30 @@ CrashLens is used like this:
 ./crashlens <target_program> <args for target_program>
 ````
 
-The goal of CrashLens is to run a target program and observe what happens when that program exits, receives a signal, or crashes.
+The goal of CrashLens is to run a target program and observe what happens when that program stops(by normal exit, crash, signal, etc).
 To do this, CrashLens uses a parent-child process structure.
 
-First, CrashLens calls `fork()`.
-After `fork()`, there are now two processes:
-
+First, CrashLens calls `fork()`. After `fork()`, there are now two processes:
 ```text
 parent process: CrashLens itself
 child process:  the process that will become the target program
 ```
-
 The child process will eventually run the target program.
-
 The parent process will monitor that child process.
 
 In the child process, CrashLens first calls:
-
 ```cpp
 ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
 ```
-
 This means:
-
 ```text
 Allow my parent process to trace me.
 ```
 
 After that, the child calls:
-
 ```cpp
 execvp(program, args);
 ```
-
 This replaces the child process with the target program.
 
 At this point, something important happens.
@@ -53,7 +44,6 @@ At this point, something important happens.
 The child does not immediately start running the target program normally. Because the child called `PTRACE_TRACEME` before `execvp()`, the operating system stops the child with `SIGTRAP` right after the successful `exec()`.
 
 So the flow looks like this:
-
 ```text
 parent: waitpid(child, &status, 0)
 
@@ -68,21 +58,16 @@ exec() succeeds
 ```
 
 This first stop is important because it gives the parent process control before the target program actually runs.
-
 Once the parent sees that the child has stopped, it can allow the target program to continue:
-
 ```cpp
 ptrace(PTRACE_CONT, child, nullptr, nullptr);
 ```
-
 This means:
-
 ```text
 Continue running the traced child process until something interesting happens.
 ```
 
 After this, the target program can do one of several things:
-
 ```text
 1. It can exit normally.
 2. It can crash, for example with SIGSEGV.
@@ -101,15 +86,4 @@ This is the moment where CrashLens can inspect the crash:
 - What were the register values?
 - Which function calls led to this point?
 - Why did the crash happen?
-```
-
-In other words, `ptrace()` is the mechanism that lets CrashLens stand between the operating system and the crashing program.
-
-It lets us say:
-
-```text
-Before this program dies, let me look inside.
-```
-
-```
 ```
