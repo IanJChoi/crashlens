@@ -1,11 +1,14 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
+#include <sys/personality.h>
 #include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <string>
 #include <cstdint>
+
+#include "crlns.h"
 
 static const char* signal_name(int sig) {
     switch (sig) {
@@ -39,6 +42,7 @@ int main(int argc, char* argv[]) {
     if (child == 0) {
         // child: tell kernel to let parent trace us, then exec target
         ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
+        personality(ADDR_NO_RANDOMIZE);
         execvp(target_argv[0], target_argv.data());
         perror("execvp");
         _exit(1);
@@ -50,13 +54,17 @@ int main(int argc, char* argv[]) {
     while (1) {
         waitpid(child, &status, 0);
         if (WIFEXITED(status)) {
+            printf("message from crashlens:\n");
             printf("Program exited normally with code %d.\n", WEXITSTATUS(status));
             return 0;
         }
         if (WIFSTOPPED(status)) {
             int sig = WSTOPSIG(status);
             if (is_crash_signal(sig)) {
+                printf("message from crashlens:\n");
                 printf("Crash detected! Signal: %s (%d)\n", signal_name(sig), sig);
+                read_regs(child);
+
                 kill(child, SIGKILL);
                 waitpid(child, nullptr, 0);
                 return 1;
@@ -66,6 +74,7 @@ int main(int argc, char* argv[]) {
         }
         if (WIFSIGNALED(status)) {
             int sig = WTERMSIG(status);
+            printf("message from crashlens:\n");
             printf("Program killed by signal %s (%d).\n", signal_name(sig), sig);
             return 1;
         }

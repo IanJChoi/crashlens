@@ -1,11 +1,14 @@
-CXX      = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -g
-TARGET   = ./crashlens
+CXX = g++
+CXXFLAGS = -std=c++17 -g -Wall -Wextra
 
-$(TARGET): main.cpp
-	$(CXX) $(CXXFLAGS) -o $(TARGET) main.cpp
+OBJECTS = crlns.o crlns-info.o
+
+crlns: $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o crlns $(OBJECTS)
+
+$(OBJECTS): crlns.h
 
 clean:
-	rm -f $(TARGET)
+	rm -f *.o crlns
 
 .PHONY: clean
