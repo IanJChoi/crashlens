@@ -1,11 +1,17 @@
 CXX      = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -g
-TARGET = normal_exit
 
-$(TARGET): normal_exit.cpp
-	$(CXX) $(CXXFLAGS) -o $(TARGET) normal_exit.cpp
+TARGETS = normal_exit segv
+
+all: $(TARGETS)
+
+normal_exit: normal_exit.cpp
+	$(CXX) $(CXXFLAGS) -o normal_exit normal_exit.cpp
+
+segv: segv.cpp
+	$(CXX) $(CXXFLAGS) -o segv segv.cpp
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGETS)
 
-.PHONY: clean
+.PHONY: all clean

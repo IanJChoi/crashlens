@@ -9,6 +9,5 @@ int main(int argc, char **argv) {
 
     int code = std::atoi(argv[1]);
     if (code == 0) return 0;
-
     std::exit(code);
 }
