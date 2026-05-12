@@ -57,25 +57,19 @@ Once the parent sees that the child has stopped, it can allow the target program
 ```cpp
 ptrace(PTRACE_CONT, child, nullptr, nullptr);
 ```
-This means:
-```text
-Continue running the traced child process until it stops again.
-```
+This means: "Continue running the traced child process until it stops again."
 
 After this, the target program can do one of several things:
-```text
 1. It can exit normally.
 2. It can crash, for example with SIGSEGV.
 3. It can stop because of another signal.
-```
+
 CrashLens mainly focuses on the second case: when the target program crashes.
 For example, if the target program dereferences a null pointer, the operating system sends it `SIGSEGV`. Because the program is being traced, the parent process gets a chance to observe that signal before the program fully terminates.
 
 This is the moment where CrashLens can inspect the crash:
-```text
 - What signal occurred?
 - At what instruction address did the crash happen?
 - What were the register values?
 - Which function calls led to this point?
 - Why did the crash happen?
-```
