@@ -7,7 +7,6 @@ Here, we are going to learn debugging one step at a time. When a program crashes
 We will build a small debugger-like tool from scratch and use it to study real program failures. We will learn how to find the exact address where a crash occurred, how to inspect registers, how to trace which functions led to the crash, and how to reason about why the crash happened. CrashLens is designed as an educational project: a place where students can see how debugging works underneath the surface by directly implementing the pieces themselves.
 
 ## Lecture 1: Understanding `ptrace()`
-
 CrashLens is used like this:
 ````bash
 ./crashlens <target_program> <args for target_program>
@@ -56,3 +55,5 @@ After this, the target program can do one of several things:
 3. It can stop because of another signal.
 ````
 CrashLens mainly focuses on the second case: when the target program crashes. For example, if the target program dereferences a null pointer, the operating system sends it `SIGSEGV`. Because the program is being traced, the parent process gets a chance to observe that signal before the program fully terminates.
+
+See: src/crlns.cpp
