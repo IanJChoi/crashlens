@@ -17,10 +17,9 @@ The goal of CrashLens is to run a target program and observe what happens when t
 To do this, CrashLens uses a parent-child process structure.
 
 First, CrashLens calls `fork()`. After `fork()`, there are now two processes:
-```text
 parent process: CrashLens itself
 child process:  the process that will become the target program
-```
+
 The child process will eventually run the target program.
 The parent process will monitor that child process.
 
@@ -28,10 +27,7 @@ In the child process, it calls:
 ```cpp
 ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
 ```
-This means:
-```text
-Allow my parent process to trace me.
-```
+This means: "Allow my parent process to trace me."
 
 After that, the child calls:
 ```cpp
@@ -46,12 +42,9 @@ The child does not immediately start running the target program normally. Becaus
 Meanwhile, the parent process was waiting with `waitpid()` until the child sends this first `SIGTRAP`.
 
 So the flow looks like this:
-```text
 parent: waitpid(child, &status, 0)
-
 child:  ptrace(PTRACE_TRACEME, ...)
 child:  execvp(target_program, args)
-
 exec() succeeds
 → child process image is replaced by the target program
 → target program is ready to run
