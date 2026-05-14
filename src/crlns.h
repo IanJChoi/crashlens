@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <cstddef>
 
-bool read_regs(pid_t child, unsigned long long* rip_out);
+bool read_regs(pid_t child, user_regs_struct* regs_out);
 bool read_bytes(pid_t child, unsigned long long addr);
 
 struct symbol_info {
