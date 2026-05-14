@@ -1,6 +1,7 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <sys/personality.h>
+#include <sys/user.h>
 #include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
@@ -29,47 +30,59 @@ static bool is_crash_signal(int sig) {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Usage: ./crashlens <program> [args...]\n");
+        fprintf(stderr, "Usage: ./crlns <program> [args...]\n");
         return 1;
     }
-    // argv[1..] → target program + its arguments
+
     std::vector<char*> target_argv(argv + 1, argv + argc);
     target_argv.push_back(nullptr);
+
     pid_t child = fork();
+
     if (child < 0) {
         perror("fork");
         return 1;
     }
+
     if (child == 0) {
-        // child: tell kernel to let parent trace us, then exec target
         ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
         personality(ADDR_NO_RANDOMIZE);
+
         execvp(target_argv[0], target_argv.data());
+
         perror("execvp");
         _exit(1);
     }
-    // parent: watch the child
+
     int status;
-    waitpid(child, &status, 0);  // wait for initial stop after exec
-    ptrace(PTRACE_CONT, child, nullptr, nullptr);  // let it run
+
+    waitpid(child, &status, 0);
+    ptrace(PTRACE_CONT, child, nullptr, nullptr);
+
     while (1) {
         waitpid(child, &status, 0);
+
         if (WIFEXITED(status)) {
             printf("message from crashlens:\n");
             printf("Program exited normally with code %d.\n", WEXITSTATUS(status));
             return 0;
         }
+
         if (WIFSTOPPED(status)) {
             int sig = WSTOPSIG(status);
+
             if (is_crash_signal(sig)) {
                 printf("message from crashlens:\n");
                 printf("Crash detected! Signal: %s (%d)\n", signal_name(sig), sig);
-                unsigned long long rip = 0;
-                if(read_regs(child, &rip)) {
-                    read_bytes(child, rip);
+
+                user_regs_struct regs;
+
+                if (read_regs(child, &regs)) {
+                    read_bytes(child, regs.rip);
+
                     symbol_info sym_info;
 
-                    if(crlns_get_symbol_info(argv[1], &sym_info) == 0) {
+                    if (crlns_get_symbol_info(argv[1], &sym_info) == 0) {
                         crlns_backtrace(child, &sym_info, &regs);
                     }
                 }
@@ -78,11 +91,13 @@ int main(int argc, char* argv[]) {
                 waitpid(child, nullptr, 0);
                 return 1;
             }
-            // not a crash signal — forward it and continue
+
             ptrace(PTRACE_CONT, child, nullptr, (void*)(intptr_t)sig);
         }
+
         if (WIFSIGNALED(status)) {
             int sig = WTERMSIG(status);
+
             printf("message from crashlens:\n");
             printf("Program killed by signal %s (%d).\n", signal_name(sig), sig);
             return 1;

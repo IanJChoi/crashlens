@@ -1,7 +1,6 @@
 #ifndef CRLNS_H
 #define CRLNS_H
 
-#include <sys/types.h>  // pid_t
 #include <sys/types.h>
 #include <sys/user.h>
 #include <elf.h>
