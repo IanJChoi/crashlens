@@ -67,6 +67,11 @@ int main(int argc, char* argv[]) {
                 unsigned long long rip = 0;
                 if(read_regs(child, &rip)) {
                     read_bytes(child, rip);
+                    symbol_info sym_info;
+
+                    if(crlns_get_symbol_info(argv[1], &sym_info) == 0) {
+                        crlns_backtrace(child, &sym_info, &regs);
+                    }
                 }
 
                 kill(child, SIGKILL);
