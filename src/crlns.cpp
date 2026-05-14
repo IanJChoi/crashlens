@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <csignal>
 
 #include "crlns.h"
 
@@ -63,7 +64,10 @@ int main(int argc, char* argv[]) {
             if (is_crash_signal(sig)) {
                 printf("message from crashlens:\n");
                 printf("Crash detected! Signal: %s (%d)\n", signal_name(sig), sig);
-                read_regs(child);
+                unsigned long long rip = 0;
+                if(read_regs(child, &rip)) {
+                    read_bytes(child, rip);
+                }
 
                 kill(child, SIGKILL);
                 waitpid(child, nullptr, 0);
