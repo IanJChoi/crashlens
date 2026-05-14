@@ -144,8 +144,9 @@ int crlns_backtrace(pid_t pid, symbol_info* sym_info, user_regs_struct* regs) {
         }
 
         const char* func_name = &sym_info->strtab[func->st_name];
+        uint64_t func_addr = func->st_value;
 
-        printf("  #%d  0x%lx in %s\n", frame, addr, func_name);
+        printf("  #%d  0x%lx in %s(0x%lx)\n", frame, addr, func_name, func_addr);
 
         if (strcmp(func_name, "main") == 0) {
             return 0;

@@ -14,7 +14,7 @@ bool read_regs(pid_t child, user_regs_struct* regs_out) {
         return false;
     }
 
-    printf("Register state at crash:\n");
+    printf("\nRegister state at crash:\n");
     printf("  RIP = 0x%llx\n", regs_out->rip);
     printf("  RSP = 0x%llx\n", regs_out->rsp);
     printf("  RBP = 0x%llx\n", regs_out->rbp);
@@ -43,7 +43,7 @@ bool read_bytes(pid_t child, unsigned long long addr) {
         return false;
     }
 
-    printf("Memory at address (8 bytes):\n");
+    printf("\nMemory at address (8 bytes):\n");
     printf("  [0x%llx] = 0x%016lx\n", addr, data);
 
     unsigned char* bytes = reinterpret_cast<unsigned char*>(&data);
