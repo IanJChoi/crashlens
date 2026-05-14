@@ -47,7 +47,7 @@ bool read_bytes(pid_t child, unsigned long long addr) {
         return false;
     }
 
-    printf("\nMemory at address:\n");
+    printf("Memory at address:\n");
     printf("  [0x%llx] = 0x%016lx\n", addr, data);
 
     unsigned char* bytes = reinterpret_cast<unsigned char*>(&data);
