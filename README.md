@@ -1,6 +1,6 @@
 # crashlens
 
-Welcome to crashlens
+Welcome to crashlens.
 
 Here, we are going to learn debugging one step at a time. When a program crashes, our goal is not just to say that an error happened. Our goal is to understand how that error can be captured, inspected, and explained.
 
