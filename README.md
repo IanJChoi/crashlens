@@ -181,7 +181,7 @@ The other registers also give useful context:
 RSP: stack pointer
 RBP: base pointer
 RAX, RBX, RCX, RDX: general-purpose registers
-RSI, RDI: registers often used for function arguments
+RSI: registers often used for function arguments
 ```
 
 For this simple null pointer crash, one especially interesting register is often `RAX`, because the compiler may load the value of `p` into `RAX` before writing through it.
